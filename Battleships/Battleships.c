@@ -1,4 +1,4 @@
-//Lalith Vaishnav Elangovan 1006916884 code for blackjack game
+//Lalith Vaishnav Elangovan code for blackjack game
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
