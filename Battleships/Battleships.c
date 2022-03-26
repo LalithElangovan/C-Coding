@@ -1,73 +1,104 @@
-//Lalith Vaishnav Elangovan code for blackjack game
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
-
-int main(int argc, char **argv) {
-    int playerSum,playerCard,playerValue,dealerCard,dealerValue,dealerSum;
-    int playerInput;
-    if(argc==1)
-        srand(time(NULL));
-    else
-        srand(atoi(argv[1]));
-
-// This is to generate the two random cards for player and dealer
-    dealerCard= rand() %13 + 1;
-    playerCard= rand() %13 + 1;
-    printf("First cards: player %d, dealer %d \n",playerCard,dealerCard);
-
-//This code is to make sure the cards above 10 are worth 10
-    if(playerCard<=10)
-        playerValue=playerCard;
-    else
-        playerValue=10;
-    playerSum=playerValue;
-    if(dealerCard<=10)
-        dealerValue=dealerCard;
-    else
-        dealerValue=10;
-    dealerSum=dealerValue;
-
-// This section is the do while loop for the players cards 
-    do {
-        do{printf("Type 1 for Hit, 0 to Stay: ");
-            scanf("%d",&playerInput);} while (playerInput!=1&&playerInput!=0);
-        if (playerInput==1){
-            playerCard= rand() %13 + 1;
-            if(playerCard<=10)
-                playerValue=playerCard;
-            else
-                playerValue=10;
-            playerSum = playerValue + playerSum;
-            printf("Player gets a %d, worth is %d \n",playerCard,playerSum);
-       } 
-    }while (playerSum<=21&&playerInput==1);
-    if(playerSum>21)
-        printf("Player over 21, Dealer wins\n");
-
-//This code is for the dealer and the cards he recieves after the player
-    else
-        {printf("Dealer gets: ");
-        do
-            {dealerCard= rand() %13 + 1;
-            if(dealerCard<=10)
-                dealerValue=dealerCard;
-            else
-                dealerValue=10;
-                dealerSum=dealerValue + dealerSum;
-            printf("%d ", dealerCard);
-    } while (dealerSum<17);
+//Lalith Vaishnav Elangovan
+//This is the function to check the input and if ships overlap
+bool validityCheck(int rows, int columns, int orientation, int *size,int board[BOARDROWS+1][BOARDCOLS+1],bool getUserInput){
+//True false variable to help within the ppopulating function    
+    bool flag=false;
+//If statement to check inputs of the user    
+    if ((rows<1 || rows > 9) || (orientation > 1 || orientation <0) || (columns < 1 || columns > 11)){
+        if (getUserInput==true)
+            printf("Invalid Input\n");
+        *size=*size+1;
+        flag=true;
     }
-    printf("\n");
+//If statement to check each orientation and if the ship can fit in space        
+    else if (orientation==1&&(rows+(*size)-1)>9){
+        if (getUserInput==true)
+            printf("Invalid Input\n");
+        *size=*size+1;
+        flag=true;
+    }    
+    else if (orientation==0&&(columns+(*size)-1)>11){
+        if (getUserInput==true)
+            printf("Invalid Input\n");
+        *size=*size+1;
+        flag=true;
+    }
+//If statement to check conflicts with other ships for each orientation    
+    if (orientation==1 && flag==false){
+        for (int vertical= 0; vertical <= (*size)-1; vertical++){
+            if (board[rows+vertical][columns]!=0){
+                if (getUserInput==true)
+                    printf("Conflicts with ship already placed\n");
+                (*size)=(*size)+1;
+                flag=true;
+                break;
+            }
+        }}
+    else if (orientation==0 && flag==false){
+        for (int horizontal= 0; horizontal <= (*size)-1; horizontal++){
+            if (board[rows][columns+horizontal]!=0){
+                if (getUserInput==true)
+                    printf("Conflicts with ship already placed\n");
+                (*size)=(*size)+1;
+                flag=true;
+                break;
+            }
+        }
+    }
+    return flag;
+}
 
-// These if statements are for the various outcomes of the Blackjack game
-    if (dealerSum>21&&playerSum<=21)
-        printf("Dealer over 21, Player wins\n");
-    if (dealerSum==playerSum)
-        printf("Tie!\n");
-    if (dealerSum<21&&playerSum<21&&dealerSum>playerSum)   
-        printf("Dealer better than Player, Dealer wins\n");
-    if (playerSum<21&&dealerSum<21&&dealerSum<playerSum)
-        printf("Player better than Dealer, Player wins\n");   
-    return 0;
+void populateBoard(bool getUserInput, int board[BOARDROWS+1][BOARDCOLS+1]){
+
+    //******* YOUR CODE GOES HERE TO POPULATE THE BOARDS
+    int rows, columns, orientation,size;
+    bool flag=false;
+//To determine if to populate user board or computer board    
+    if (getUserInput==1)
+    { printf ("Rows are 1 - 9, Columns are 1 - 11\nOrientation is 0 for across, 1 for down\n");
+//for loop to repeat the printf statement and to go from 5 to 1
+    for (size = 5; size > 0; size--)
+    {
+        printf("Give starting row, starting column and orientation (3 inputs) for ship of size=%d:",size);
+        scanf("%d %d %d", &rows,&columns,&orientation);
+//Calling the checking function, for the inputs        
+        flag=validityCheck(rows,columns,orientation,&size,board,getUserInput);
+//if statement for no errors and to place the boat in either orientation        
+        if (flag==false){
+        if (orientation==1){
+            for (int vertical= 0; vertical <= size-1; vertical++)
+            {
+                board[rows+vertical][columns]= size;
+            }        
+        }
+        else{
+            for (int horizontal= 0; horizontal <= size-1; horizontal++)
+            board[rows][columns+horizontal] = size;
+        }  
+        }
+    }
+    }
+//The other option which is to poulate the computer board    
+    else{
+        for (size = 5; size > 0; size--){
+//The functions used are to get the random numbers to populate the computer board
+            rows=getRand(1,9);
+            columns=getRand(1,11);
+            orientation=getRand(0,1);
+//Calls function to ensure no conflicts with ships and populates the computer board            
+            flag=validityCheck(rows,columns,orientation,&size,board,getUserInput);
+            if (flag==false){
+                if (orientation==1){
+                    for (int vertical= 0; vertical <= size-1; vertical++)
+                    {
+                        board[rows+vertical][columns]= size;
+                    }        
+                }
+                else{
+                    for (int horizontal= 0; horizontal <= size-1; horizontal++)
+                        board[rows][columns+horizontal] = size;
+                }  
+            }
+        }
+    }
 }
