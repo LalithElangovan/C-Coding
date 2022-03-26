@@ -1,2 +1,2 @@
-This was to create a game of blackjack and use the terminal to print out statements for the user to use.
-The player is allowed to use 1/0 to hit or pass respectively.
+This project was to create a board using user inputs to initialize battleships at certain locations.
+Then we had to use rand to generate the computers attempts to hit the users ships
